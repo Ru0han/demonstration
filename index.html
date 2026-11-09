@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Project demonstration video.">
+  <title>Project Demonstration</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #e7eaf0;
+      --accent: #2457a7;
+      --page: #f7f8fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 64px 24px;
+      background: var(--page);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    main {
+      width: min(100%, 960px);
+      margin: 0 auto;
+      padding: 44px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 12px 36px rgba(23, 32, 51, 0.06);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      text-align: center;
+      font-size: clamp(28px, 4vw, 38px);
+      line-height: 1.2;
+      letter-spacing: -0.7px;
+    }
+
+    .intro {
+      margin: 0 auto 34px;
+      max-width: 680px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 20px;
+      font-weight: 650;
+    }
+
+    video {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      background: #080808;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);
+    }
+
+    .download {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 28px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .download p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .download a {
+      flex: 0 0 auto;
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .download a:hover { background: #194785; }
+
+    footer {
+      margin-top: 30px;
+      color: #98a1b2;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 24px 12px; }
+      main { padding: 26px 18px; border-radius: 14px; }
+      .download { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Project Demonstration</h1>
+    <p class="intro">
+      Watch the demonstration video below.
+    </p>
+
+    <section aria-labelledby="demo-heading">
+      <h2 id="demo-heading">Demo Video</h2>
+      <video controls playsinline preload="metadata">
+        <source src="demo.mp4" type="video/mp4">
+        Your browser does not support HTML5 video playback.
+        <a href="demo.mp4">Download the demo video</a>.
+      </video>
+    </section>
+
+    <section class="download" aria-label="README download">
+      <div>
+        <strong>README</strong>
+        <p>Download the README file for the accompanying explanation.</p>
+      </div>
+      <a href="README.md" download="README.md">Download README</a>
+    </section>
+
+    <footer>Project Demonstration</footer>
+  </main>
+</body>
+</html>
