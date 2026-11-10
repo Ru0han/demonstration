@@ -85,35 +85,28 @@ not opened automatically by the recording helper.
 
 For the phone used in this experiment, the CPU topology is:
 
--   **LITTLE cluster:** CPU 0--CPU 5 (six cores).
--   **Big cluster:** CPU 6--CPU 7 (two cores).
+- **LITTLE cluster:** CPU 0–CPU 5 (six cores).
+- **Big cluster:** CPU 6–CPU 7 (two cores).
 
-The SQL query below calculates the **time-based CPU utilization** of
-each LITTLE core and the average utilization across the six-core LITTLE
-cluster.
+The SQL query below calculates the **time-based CPU utilization** of each LITTLE core and the average utilization across the six-core LITTLE cluster.
 
-A row in Perfetto's `sched` table represents a scheduling slice: a
-thread running on a CPU for a certain duration. The query uses
-`sched.dur` to accumulate the time during which each LITTLE core
-executes a non-idle thread.
+A row in Perfetto's `sched` table represents a scheduling slice: a thread running on a CPU for a certain duration. The query uses `sched.dur` to accumulate the time during which each LITTLE core executes a non-idle thread.
 
 The calculation follows these definitions:
 
-1. **Per-core busy time:** the sum of the durations of all non-idle
-   scheduling slices on that core, clipped to the trace interval. Idle
-   execution is excluded by filtering out `utid = 0`, `tid = 0`, and
-   thread names matching `swapper%`.
+1. **Per-core busy time:** the sum of the durations of all non-idle scheduling slices on that core, clipped to the trace interval. Idle execution is excluded by filtering out `utid = 0`, `tid = 0`, and thread names matching `swapper%`.
 
 2. **Per-core time utilization:**
 
-   \[ U_i = `\frac{T_{\mathrm{busy},i}}{T_{\mathrm{trace}}}`{=tex}
-   `\times 100`{=tex}% \]
+   $$
+   U_i = \frac{T_{\mathrm{busy},i}}{T_{\mathrm{trace}}} \times 100\%
+   $$
 
 3. **Average LITTLE-cluster time utilization:**
 
-   \[ U\_{`\mathrm{LITTLE}`{=tex}} =
-   `\frac{\sum_{i=0}^{5} T_{\mathrm{busy},i}}`{=tex} {6
-   `\times `{=tex}T\_{`\mathrm{trace}`{=tex}}} `\times 100`{=tex}% \]
+   $$
+   U_{\mathrm{LITTLE}} = \frac{\sum_{i=0}^{5} T_{\mathrm{busy},i}}{6 \times T_{\mathrm{trace}}} \times 100\%
+   $$
 
 The cluster result is normalized by **six cores**. It is therefore the
 arithmetic mean of the six per-core utilization values, not the sum of
@@ -231,3 +224,4 @@ one final row (`All Little Cores (Average)`). The columns are:
     row, this is the average busy time per LITTLE core.
 -   `utilization_pct`: time utilization as a percentage of the trace
     duration; for the average row, it is normalized by six cores.
+
