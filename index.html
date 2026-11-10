@@ -129,11 +129,75 @@
         </p>
       </div>
 
-      <a href="README.md" download="README.md">
+      <a href="README.md"
+         download="README.md"
+         id="readme-download">
         Download README
       </a>
     </section>
 
   </main>
+
+  <script>
+    (function () {
+      const link = document.getElementById("readme-download");
+      if (!link) return;
+
+      // Anonymous GitHub serves repository files through this same-origin API.
+      // On ordinary GitHub Pages and when opened locally, keep the relative
+      // README.md link and the browser's native download behavior.
+      const isAnonymousGitHub =
+        window.location.hostname === "anonymous.4open.science";
+
+      if (!isAnonymousGitHub) return;
+
+      const anonymousReadmeUrl =
+        "/api/repo/demo-88D2/file/README.md";
+
+      link.href = anonymousReadmeUrl;
+      link.removeAttribute("download");
+
+      link.addEventListener("click", async function (event) {
+        event.preventDefault();
+
+        const originalText = link.textContent;
+        link.textContent = "Preparing download...";
+
+        try {
+          const response = await fetch(anonymousReadmeUrl, {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store"
+          });
+
+          if (!response.ok) {
+            throw new Error("README request failed: HTTP " + response.status);
+          }
+
+          const blob = await response.blob();
+          const objectUrl = URL.createObjectURL(blob);
+          const temporaryLink = document.createElement("a");
+
+          temporaryLink.href = objectUrl;
+          temporaryLink.download = "README.md";
+          document.body.appendChild(temporaryLink);
+          temporaryLink.click();
+          temporaryLink.remove();
+
+          window.setTimeout(function () {
+            URL.revokeObjectURL(objectUrl);
+          }, 1000);
+        } catch (error) {
+          console.error(error);
+          // Fallback: open the Anonymous GitHub file endpoint. This may show
+          // its preview page, but still lets the user access the README.
+          window.location.href = anonymousReadmeUrl;
+        } finally {
+          link.textContent = originalText;
+        }
+      });
+    })();
+  </script>
+
 </body>
 </html>
