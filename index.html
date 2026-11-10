@@ -120,40 +120,30 @@
       Your browser does not support HTML5 video playback.
     </video>
 
-    <section class="download" aria-label="README download">
+    <section class="download" aria-label="README documentation">
       <div>
         <strong>README</strong>
         <p>
-          Download the README file for the
-          accompanying explanation.
+          View the README for the accompanying explanation.
         </p>
       </div>
 
       <a href="README.md"
-         id="readme-download"
-         download="README.md">
-        Download README
+         id="readme-link"
+         target="_blank"
+         rel="noopener noreferrer">
+        View README
       </a>
     </section>
 
   </main>
-
   <script>
-    (function () {
-      const downloadLink = document.getElementById("readme-download");
-      if (!downloadLink) return;
-
-      // GitHub Pages/local hosting use README.md.
-      // Anonymous GitHub uses its repository-file endpoint.
-      if (window.location.hostname === "anonymous.4open.science") {
-        downloadLink.href = "/api/repo/demo-88D2/file/README.md";
-      }
-
-      // Keep the native download attribute on both platforms.
-      // No fetch(), Blob, or cross-origin request is used.
-    })();
+    // Anonymous GitHub provides README through its anonymized file endpoint.
+    // On GitHub Pages and local hosting, use the relative README.md path.
+    if (window.location.hostname === "anonymous.4open.science") {
+      document.getElementById("readme-link").href =
+        "/api/repo/demo-88D2/file/README.md";
+    }
   </script>
-
 </body>
 </html>
-
