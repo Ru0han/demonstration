@@ -124,26 +124,16 @@
       <div>
         <strong>README</strong>
         <p>
-          View the README for the accompanying explanation.
+          Download the README instructions as a ZIP file.
         </p>
       </div>
 
-      <a href="README.md"
-         id="readme-link"
-         target="_blank"
-         rel="noopener noreferrer">
-        View README
+      <a href="README.zip" download="README.zip">
+        Download README
       </a>
     </section>
 
   </main>
-  <script>
-    // Anonymous GitHub provides README through its anonymized file endpoint.
-    // On GitHub Pages and local hosting, use the relative README.md path.
-    if (window.location.hostname === "anonymous.4open.science") {
-      document.getElementById("readme-link").href =
-        "/api/repo/demo-88D2/file/README.md";
-    }
-  </script>
+
 </body>
 </html>
