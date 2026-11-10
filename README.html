@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>README | Demo Video</title>
+  <style>
+    :root { color-scheme:light; --ink:#172033; --muted:#667085; --line:#e7eaf0; --accent:#2457a7; --page:#f7f8fb; }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;padding:42px 20px;background:var(--page);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+    main{max-width:930px;margin:auto;padding:42px 56px 56px;background:white;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(23,32,51,.04)}
+    nav{margin-bottom:22px;font-size:14px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    h1,h2,h3{line-height:1.3;color:#172033;scroll-margin-top:20px}
+    h1{font-size:29px;letter-spacing:-.4px;margin:0 0 22px;border-bottom:1px solid var(--line);padding-bottom:20px}
+    h2{font-size:23px;margin:38px 0 18px;border-bottom:1px solid var(--line);padding-bottom:10px}
+    h3{font-size:18px;margin:28px 0 13px}
+    p,ul,ol{margin:12px 0}
+    ul,ol{padding-left:27px}
+    li{margin:5px 0}
+    code{font: .9em/1.55 Consolas,"Cascadia Code","SFMono-Regular",monospace;background:#f2f4f8;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+    pre{background:#f6f8fb;border:1px solid #e1e6ee;border-radius:9px;padding:19px 20px;overflow-x:auto;margin:18px 0 22px;line-height:1.55}
+    pre code{padding:0;background:none;border-radius:0;font-size:13px;white-space:pre;overflow-wrap:normal}
+    blockquote{margin:18px 0;padding:9px 17px;border-left:4px solid #8db1e4;background:#f6f9fe;color:#40536d}
+    blockquote p{margin:0}
+    .equation{margin:19px 0;padding:12px 8px;overflow-x:auto;text-align:center;background:#fbfcff;border-radius:8px}
+    .equation math{font-size:1.18em}
+    strong{font-weight:650}
+    @media(max-width:700px){body{padding:14px 10px}main{padding:25px 19px;border-radius:10px}h1{font-size:24px}h2{font-size:20px}pre{padding:13px 12px}pre code{font-size:12px}}
+  </style>
+</head>
+<body>
+  <main>
+    <nav><a href="index.html" aria-label="Back to demo video">← Back to Demo Video</a></nav>
+    <article>
+<h1>Reproducing Android LITTLE-Core CPU Time Utilization</h1>
+<p>This README describes the two steps required to reproduce the
+experiment: collecting a system-wide Perfetto trace from an Android
+phone with eight background applications, and calculating the time-based
+utilization of the LITTLE CPU cluster from that trace.</p>
+<h2>Step 1. Collect a Perfetto Trace</h2>
+<h3>Experimental workload and setup</h3>
+<p>Use a <strong>physical Android phone</strong> connected to a Windows PC over USB.</p>
+<p>Before recording, make sure that USB debugging is enabled and that the
+phone has authorized the connected PC. The PC should have:</p>
+<ul>
+<li>Android Platform Tools installed, with <code>adb</code> available in
+PowerShell.</li>
+<li>Python 3 installed and available through the Windows <code>py</code> launcher.</li>
+</ul>
+<p>The background workload consists of the following eight applications:</p>
+<ol>
+<li>Facebook</li>
+<li>Instagram</li>
+<li>YouTube</li>
+<li>Tiktok</li>
+<li>ChatGPT</li>
+<li>Gemini</li>
+<li>X</li>
+<li>Gmail</li>
+</ol>
+<p>Launch the eight applications and leave them running in the background
+during trace collection. Do not force-stop them. Keep the workload
+unchanged throughout the recording.</p>
+<h3>Recording command</h3>
+<p>Open PowerShell in the directory where you want to keep the recording
+helper script. The following commands download the official Perfetto
+Android recording helper, check the ADB connection, and collect a
+five-minute trace:</p>
+<pre><code class="language-powershell"># Download the official Perfetto Android trace-recording helper.
+Invoke-WebRequest `
+  -Uri &quot;https://raw.githubusercontent.com/google/perfetto/main/tools/record_android_trace&quot; `
+  -OutFile &quot;.\record_android_trace.py&quot;
+
+# Check that the Android phone is connected and authorized.
+adb devices
+
+# Record a 5-minute system-wide trace.
+py -3 .\record_android_trace.py `
+  -o &quot;$HOME\Desktop\oppo_cpu_trace.perfetto-trace&quot; `
+  -t 5m `
+  -b 64mb `
+  sched freq idle
+</code></pre>
+<p>Make sure that <code>adb devices</code> lists the phone with the state <code>device</code>
+(rather than <code>unauthorized</code>).</p>
+<p>The recording options are:</p>
+<ul>
+<li><code>-o</code>: output trace-file path.</li>
+<li><code>-t 5m</code>: trace duration of five minutes.</li>
+<li><code>-b 64mb</code>: 64 MB trace buffer.</li>
+<li><code>sched</code>: records CPU scheduling activity, including which thread
+runs on each CPU and for how long.</li>
+<li><code>freq</code>: records CPU frequency changes.</li>
+<li><code>idle</code>: records CPU idle-state events.</li>
+</ul>
+<p>When recording finishes, the trace is saved as:</p>
+<pre><code class="language-text">%USERPROFILE%\Desktop\oppo_cpu_trace.perfetto-trace
+</code></pre>
+<p>Open the trace in the <a href="https://ui.perfetto.dev">Perfetto UI</a> if it is
+not opened automatically by the recording helper.</p>
+<h2>Step 2. Calculate LITTLE-Core Time Utilization</h2>
+<h3>Metric definition</h3>
+<p>For the phone used in this experiment, the CPU topology is:</p>
+<ul>
+<li><strong>LITTLE cluster:</strong> CPU 0–CPU 5 (six cores).</li>
+<li><strong>Big cluster:</strong> CPU 6–CPU 7 (two cores).</li>
+</ul>
+<p>The SQL query below calculates the <strong>time-based CPU utilization</strong> of each LITTLE core and the average utilization across the six-core LITTLE cluster.</p>
+<p>A row in Perfetto's <code>sched</code> table represents a scheduling slice: a thread running on a CPU for a certain duration. The query uses <code>sched.dur</code> to accumulate the time during which each LITTLE core executes a non-idle thread.</p>
+<p>The calculation follows these definitions:</p>
+<ol>
+<li><p><strong>Per-core busy time:</strong> the sum of the durations of all non-idle scheduling slices on that core, clipped to the trace interval. Idle execution is excluded by filtering out <code>utid = 0</code>, <code>tid = 0</code>, and thread names matching <code>swapper%</code>.</p>
+</li>
+<li><p><strong>Per-core time utilization:</strong></p>
+</li>
+</ol>
+<div class="equation" role="math" aria-label="U sub i equals T busy sub i divided by T trace, times 100 percent"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>U</mi><mi>i</mi></msub><mo>=</mo><mfrac><msub><mi>T</mi><mrow><mi mathvariant="normal">busy</mi><mo>,</mo><mi>i</mi></mrow></msub><msub><mi>T</mi><mi mathvariant="normal">trace</mi></msub></mfrac><mo>×</mo><mn>100</mn><mo>%</mo></math></div>
+<ol start="3">
+<li><strong>Average LITTLE-cluster time utilization:</strong></li>
+</ol>
+<div class="equation" role="math" aria-label="U LITTLE equals the sum of busy times across cores zero through five divided by six times T trace, times 100 percent"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>U</mi><mi mathvariant="normal">LITTLE</mi></msub><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><mn>5</mn></munderover><msub><mi>T</mi><mrow><mi mathvariant="normal">busy</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><mrow><mn>6</mn><mo>×</mo><msub><mi>T</mi><mi mathvariant="normal">trace</mi></msub></mrow></mfrac><mo>×</mo><mn>100</mn><mo>%</mo></math></div>
+<p>The cluster result is normalized by <strong>six cores</strong>. It is therefore the
+arithmetic mean of the six per-core utilization values, not the sum of
+their utilization percentages. For example, an average utilization of
+25% means that the LITTLE cluster has, on average, the equivalent of 1.5
+cores busy.</p>
+<p>This is a <strong>time-only</strong> metric. It does not weight execution time by CPU
+frequency or compute capacity. Although the trace also records frequency
+and idle-state events, this SQL query uses scheduling time (<code>sched</code>)
+only.</p>
+<p>The query is system-wide: it counts non-idle threads scheduled on LITTLE
+CPUs, including application threads and kernel threads. It is not
+restricted to the eight named applications.</p>
+<blockquote>
+<p><strong>Portability note:</strong> CPU 0--5 are the LITTLE cores and CPU 6--7 are
+the big cores on the device used for this experiment. CPU numbering
+can differ across devices. If reproducing the experiment on another
+phone, verify its CPU topology and update the <code>little_cpus</code> list
+accordingly.</p>
+</blockquote>
+<h3>Perfetto SQL query</h3>
+<p>Open the collected trace in the Perfetto UI, select the <strong>Query (SQL)</strong>
+interface, and execute the following query:</p>
+<pre><code class="language-sql">WITH
+-- 1. Obtain the trace observation interval.
+bounds AS (
+  SELECT
+    start_ts,
+    end_ts,
+    end_ts - start_ts AS duration_ns
+  FROM trace_bounds
+),
+
+-- 2. LITTLE cores on the tested device.
+little_cpus(cpu) AS (
+  VALUES (0), (1), (2), (3), (4), (5)
+),
+
+-- 3. Accumulate non-idle running time on each LITTLE core.
+--    Scheduling slices are clipped to the trace interval.
+per_cpu AS (
+  SELECT
+    c.cpu,
+    b.duration_ns,
+
+    COALESCE(
+      SUM(
+        CASE
+          WHEN s.utid != 0
+            AND COALESCE(t.tid, -1) != 0
+            AND COALESCE(t.name, '') NOT LIKE 'swapper%'
+          THEN
+            MIN(s.ts + s.dur, b.end_ts)
+            - MAX(s.ts, b.start_ts)
+          ELSE 0
+        END
+      ),
+      0
+    ) AS busy_ns
+
+  FROM little_cpus c
+  CROSS JOIN bounds b
+  LEFT JOIN sched s
+    ON s.cpu = c.cpu
+    AND s.dur &gt; 0
+    AND s.ts &lt; b.end_ts
+    AND s.ts + s.dur &gt; b.start_ts
+  LEFT JOIN thread t
+    ON s.utid = t.utid
+  GROUP BY
+    c.cpu,
+    b.duration_ns
+),
+
+-- 4. Report per-core utilization and the six-core average.
+results AS (
+  SELECT
+    'CPU' || CAST(cpu AS TEXT) AS cpu_group,
+    busy_ns / 1e9 AS busy_time_s,
+    100.0 * busy_ns / duration_ns AS utilization_pct,
+    0 AS sort_key
+  FROM per_cpu
+
+  UNION ALL
+
+  SELECT
+    'All Little Cores (Average)' AS cpu_group,
+    SUM(busy_ns) / (6.0 * 1e9) AS busy_time_s,
+    100.0 * SUM(busy_ns) / (6.0 * MAX(duration_ns))
+      AS utilization_pct,
+    1 AS sort_key
+  FROM per_cpu
+)
+
+SELECT
+  cpu_group,
+  ROUND(busy_time_s, 3) AS busy_time_s,
+  ROUND(utilization_pct, 2) AS utilization_pct
+FROM results
+ORDER BY
+  sort_key,
+  cpu_group;
+</code></pre>
+<p>The result contains one row for each LITTLE core (<code>CPU0</code>--<code>CPU5</code>) and
+one final row (<code>All Little Cores (Average)</code>). The columns are:</p>
+<ul>
+<li><code>cpu_group</code>: the LITTLE core or the six-core average.</li>
+<li><code>busy_time_s</code>: non-idle running time in seconds. For the average
+row, this is the average busy time per LITTLE core.</li>
+<li><code>utilization_pct</code>: time utilization as a percentage of the trace
+duration; for the average row, it is normalized by six cores.</li>
+</ul>
+    </article>
+  </main>
+</body>
+</html>
