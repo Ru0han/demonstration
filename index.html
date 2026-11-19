@@ -58,6 +58,18 @@
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);
     }
 
+
+    .information-section { margin-top: 32px; }
+    .information-section h2 { font-size: 21px; margin: 0 0 14px; letter-spacing: -0.25px; }
+    .summary-text { margin: 0; color: #435067; line-height: 1.8; font-size: 15px; }
+    .timeline { list-style: none; padding: 0; margin: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .timeline li { display: grid; grid-template-columns: 58px minmax(0,1fr); gap: 16px; padding: 15px 17px; align-items: start; }
+    .timeline li + li { border-top: 1px solid var(--line); }
+    .timeline-time { font-size: 14px; color: var(--accent); text-decoration: none; font-weight: 700; font-variant-numeric: tabular-nums; padding-top: 1px; }
+    .timeline-time:hover, .timeline-time:focus-visible { text-decoration: underline; }
+    .timeline-content strong { display: block; font-size: 14px; margin-bottom: 4px; }
+    .timeline-content span { display: block; color: var(--muted); font-size: 14px; line-height: 1.65; }
+
     .download {
       display: flex;
       align-items: center;
@@ -115,10 +127,53 @@
 
     <h1>Demo Video</h1>
 
-    <video controls playsinline preload="metadata">
+    <video id="demo-video" controls playsinline preload="metadata">
       <source src="demo.mp4" type="video/mp4">
       Your browser does not support HTML5 video playback.
     </video>
+
+
+    <section class="information-section" aria-labelledby="summary-title">
+      <h2 id="summary-title">Summary</h2>
+      <p class="summary-text">
+        This video demonstrates the underutilisation of LITTLE cores on a real Android smartphone.
+        With eight applications running in the background, we collect a system-wide Perfetto trace
+        and analyse CPU scheduling activity. The six LITTLE cores (CPU0–CPU5) show an average
+        time utilisation of only <strong>16.76%</strong>, indicating substantial idle capacity.
+        This observation motivates LeAP's use of spare LITTLE cores to perform address-generation
+        and prefetching tasks for the big core.
+      </p>
+    </section>
+
+    <section class="information-section" aria-labelledby="timeline-title">
+      <h2 id="timeline-title">Video Timeline</h2>
+      <ol class="timeline">
+        <li>
+          <a class="timeline-time" href="#demo-video" data-seek="0" aria-label="Play from 00:00">00:00</a>
+          <div class="timeline-content"><strong>Hardware Platform</strong>
+            <span>Show the hardware platform and its operating system and Linux kernel information.</span>
+          </div>
+        </li>
+        <li>
+          <a class="timeline-time" href="#demo-video" data-seek="12" aria-label="Play from 00:12">00:12</a>
+          <div class="timeline-content"><strong>Background Workload</strong>
+            <span>Show the eight applications running in the background.</span>
+          </div>
+        </li>
+        <li>
+          <a class="timeline-time" href="#demo-video" data-seek="29" aria-label="Play from 00:29">00:29</a>
+          <div class="timeline-content"><strong>Trace Collection</strong>
+            <span>Record system-wide CPU scheduling activity using Perfetto.</span>
+          </div>
+        </li>
+        <li>
+          <a class="timeline-time" href="#demo-video" data-seek="95" aria-label="Play from 01:35">01:35</a>
+          <div class="timeline-content"><strong>Utilization Analysis</strong>
+            <span>Analyse the collected trace and calculate LITTLE-core utilisation using an SQL query.</span>
+          </div>
+        </li>
+      </ol>
+    </section>
 
     <section class="download" aria-label="README documentation">
       <div>
@@ -137,5 +192,25 @@
     </section>
 
   </main>
+  <script>
+    (function () {
+      const video = document.getElementById('demo-video');
+      document.querySelectorAll('[data-seek]').forEach(function (link) {
+        link.addEventListener('click', function (event) {
+          event.preventDefault();
+          const seconds = Number(link.getAttribute('data-seek'));
+          if (video && Number.isFinite(seconds)) {
+            const seek = function () {
+              video.currentTime = Math.min(seconds, Number.isFinite(video.duration) ? video.duration : seconds);
+              video.play().catch(function () {});
+            };
+            if (video.readyState >= 1) seek();
+            else video.addEventListener('loadedmetadata', seek, { once: true });
+            video.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
