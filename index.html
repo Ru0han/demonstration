@@ -58,21 +58,90 @@
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);
     }
 
+    .information-section {
+      margin-top: 32px;
+    }
 
-    .information-section { margin-top: 32px; }
-    .information-section h2 { font-size: 21px; margin: 0 0 14px; letter-spacing: -0.25px; }
-    .summary-text { margin: 0; color: #435067; line-height: 1.8; font-size: 15px; }
-    .timeline { list-style: none; padding: 0; margin: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-    .timeline li { display: grid; grid-template-columns: 58px minmax(0,1fr); gap: 16px; padding: 15px 17px; align-items: start; }
-    .timeline li + li { border-top: 1px solid var(--line); }
-    .timeline-time { font-size: 14px; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; padding-top: 1px; }
-    .timeline-content strong { display: block; font-size: 14px; margin-bottom: 4px; }
-    .timeline-content span { display: block; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .information-section h2 {
+      font-size: 21px;
+      margin: 0 0 14px;
+      letter-spacing: -0.25px;
+    }
 
-    .results-figure { margin: 0; }
-    .results-figure a { display: block; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; line-height: 0; }
-    .results-figure img { display: block; width: 100%; height: auto; }
-    .results-figure figcaption { margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.6; text-align: center; }
+    .summary-text {
+      margin: 0;
+      color: #435067;
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    .timeline {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .timeline li {
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr);
+      gap: 16px;
+      padding: 15px 17px;
+      align-items: start;
+    }
+
+    .timeline li + li {
+      border-top: 1px solid var(--line);
+    }
+
+    .timeline-time {
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      padding-top: 1px;
+    }
+
+    .timeline-content strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .timeline-content span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .results-figure {
+      margin: 0;
+    }
+
+    .results-figure a {
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      line-height: 0;
+    }
+
+    .results-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .results-figure figcaption {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      text-align: center;
+    }
 
     .download {
       display: flex;
@@ -136,60 +205,124 @@
       Your browser does not support HTML5 video playback.
     </video>
 
+    <section class="information-section"
+             aria-labelledby="summary-title">
 
-    <section class="information-section" aria-labelledby="summary-title">
       <h2 id="summary-title">Summary</h2>
+
       <p class="summary-text">
-        This video demonstrates the underutilisation of LITTLE cores on a real Android smartphone.
-        With eight applications running in the background, we collect a system-wide Perfetto trace
-        and analyse CPU scheduling activity. The six LITTLE cores (CPU0–CPU5) show an average
-        time utilisation of only <strong>16.76%</strong>, indicating substantial idle capacity.
-        This observation motivates LeAP's use of spare LITTLE cores to perform address-generation
-        and prefetching tasks for the big core.
+        This video demonstrates the underutilisation of LITTLE cores
+        on a real Android smartphone. With eight applications running
+        in the background, we collect a system-wide Perfetto trace
+        and analyse CPU scheduling activity. The six LITTLE cores
+        (CPU0–CPU5) show an average time utilisation of only
+        <strong>16.76%</strong>, indicating substantial idle capacity.
+        This observation motivates LeAP's use of spare LITTLE cores
+        to perform address-generation and prefetching tasks for
+        the big core.
       </p>
+
     </section>
 
-    <section class="information-section" aria-labelledby="timeline-title">
+    <section class="information-section"
+             aria-labelledby="timeline-title">
+
       <h2 id="timeline-title">Video Timeline</h2>
+
       <ol class="timeline">
+
         <li>
           <span class="timeline-time">00:00</span>
-          <div class="timeline-content"><strong>Hardware Platform</strong>
-            <span>Show the smartphone equipped with a MediaTek Dimensity 6300 processor, featuring six LITTLE cores (CPU0–CPU5) and two big cores (CPU6–CPU7). Check the Linux kernel version (5.15.197) using ADB.</span>
+          <div class="timeline-content">
+            <strong>Hardware Platform</strong>
+            <span>
+              Show the smartphone equipped with a MediaTek
+              Dimensity 6300 processor, featuring six LITTLE cores
+              (CPU0–CPU5) and two big cores (CPU6–CPU7).
+              Check the Linux kernel version (5.15.197) using ADB.
+            </span>
           </div>
         </li>
+
         <li>
           <span class="timeline-time">00:12</span>
-          <div class="timeline-content"><strong>Background Workload</strong>
-            <span>Show eight applications running in the background: Facebook, Instagram, YouTube, TikTok, ChatGPT, Gemini, X, and Gmail. These applications remain in the background during trace collection.</span>
+          <div class="timeline-content">
+            <strong>Background Workload</strong>
+            <span>
+              Show eight applications running in the background:
+              Facebook, Instagram, YouTube, TikTok, ChatGPT,
+              Gemini, X, and Gmail. These applications remain
+              in the background during trace collection.
+            </span>
           </div>
         </li>
+
         <li>
           <span class="timeline-time">00:29</span>
-          <div class="timeline-content"><strong>Trace Collection</strong>
-            <span>Record a five-minute system-wide Perfetto trace with a 64 MB buffer, capturing CPU scheduling, frequency, and idle-state events.</span>
+          <div class="timeline-content">
+            <strong>Trace Collection</strong>
+            <span>
+              Record a five-minute system-wide Perfetto trace
+              with a 64 MB buffer, capturing CPU scheduling,
+              frequency, and idle-state events.
+            </span>
           </div>
         </li>
+
         <li>
           <span class="timeline-time">01:35</span>
-          <div class="timeline-content"><strong>Utilization Analysis</strong>
-            <span>Open the collected trace in the Perfetto UI and execute an SQL query to calculate the time utilisation of each LITTLE core from CPU scheduling records. The six LITTLE cores exhibit an average utilisation of <strong>16.76%</strong> during the measurement interval.</span>
+          <div class="timeline-content">
+            <strong>Utilization Analysis</strong>
+            <span>
+              Open the collected trace in the Perfetto UI and
+              execute an SQL query to calculate the time
+              utilisation of each LITTLE core from CPU
+              scheduling records. The six LITTLE cores exhibit
+              an average utilisation of
+              <strong>16.76%</strong>
+              during the measurement interval.
+            </span>
           </div>
         </li>
+
       </ol>
+
     </section>
 
-    <section class="information-section" aria-labelledby="results-title">
+    <section class="information-section"
+             aria-labelledby="results-title">
+
       <h2 id="results-title">Measurement Results</h2>
+
       <figure class="results-figure">
-        <a href="measurement_results.jpg" target="_blank" rel="noopener noreferrer" aria-label="View measurement results at full resolution">
-          <img src="measurement_results.jpg" alt="Perfetto SQL query results showing utilisation of CPU0 through CPU5 and average LITTLE-core utilisation of 16.76%" loading="lazy">
+
+        <a href="measurement_results.png"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="View measurement results at full resolution">
+
+          <img
+            src="measurement_results.png"
+            alt="Perfetto SQL query results showing utilisation
+                 of CPU0 through CPU5 and average LITTLE-core
+                 utilisation of 16.76%"
+            loading="lazy">
+
         </a>
-        <figcaption>Time utilisation of the six LITTLE cores (CPU0–CPU5) measured from the collected trace. Click the image to view it at full resolution.</figcaption>
+
+        <figcaption>
+          Time utilisation of the six LITTLE cores
+          (CPU0–CPU5) measured from the collected trace.
+          Click the image to view it at full resolution.
+        </figcaption>
+
       </figure>
+
     </section>
 
-    <section class="download" aria-label="README documentation">
+    <section class="download"
+             aria-label="README documentation">
+
       <div>
         <strong>README</strong>
         <p>
@@ -203,9 +336,9 @@
          rel="noopener noreferrer">
         View README
       </a>
+
     </section>
 
   </main>
-
 </body>
 </html>
