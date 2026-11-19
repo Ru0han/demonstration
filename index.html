@@ -65,10 +65,14 @@
     .timeline { list-style: none; padding: 0; margin: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
     .timeline li { display: grid; grid-template-columns: 58px minmax(0,1fr); gap: 16px; padding: 15px 17px; align-items: start; }
     .timeline li + li { border-top: 1px solid var(--line); }
-    .timeline-time { font-size: 14px; color: var(--accent); text-decoration: none; font-weight: 700; font-variant-numeric: tabular-nums; padding-top: 1px; }
-    .timeline-time:hover, .timeline-time:focus-visible { text-decoration: underline; }
+    .timeline-time { font-size: 14px; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; padding-top: 1px; }
     .timeline-content strong { display: block; font-size: 14px; margin-bottom: 4px; }
     .timeline-content span { display: block; color: var(--muted); font-size: 14px; line-height: 1.65; }
+
+    .results-figure { margin: 0; }
+    .results-figure a { display: block; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; line-height: 0; }
+    .results-figure img { display: block; width: 100%; height: auto; }
+    .results-figure figcaption { margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.6; text-align: center; }
 
     .download {
       display: flex;
@@ -149,30 +153,40 @@
       <h2 id="timeline-title">Video Timeline</h2>
       <ol class="timeline">
         <li>
-          <a class="timeline-time" href="#demo-video" data-seek="0" aria-label="Play from 00:00">00:00</a>
+          <span class="timeline-time">00:00</span>
           <div class="timeline-content"><strong>Hardware Platform</strong>
-            <span>Show the hardware platform and its operating system and Linux kernel information.</span>
+            <span>Show the smartphone equipped with a MediaTek Dimensity 6300 processor, featuring six LITTLE cores (CPU0–CPU5) and two big cores (CPU6–CPU7). Check the Linux kernel version (5.15.197) using ADB.</span>
           </div>
         </li>
         <li>
-          <a class="timeline-time" href="#demo-video" data-seek="12" aria-label="Play from 00:12">00:12</a>
+          <span class="timeline-time">00:12</span>
           <div class="timeline-content"><strong>Background Workload</strong>
-            <span>Show the eight applications running in the background.</span>
+            <span>Show eight applications running in the background: Facebook, Instagram, YouTube, TikTok, ChatGPT, Gemini, X, and Gmail. These applications remain in the background during trace collection.</span>
           </div>
         </li>
         <li>
-          <a class="timeline-time" href="#demo-video" data-seek="29" aria-label="Play from 00:29">00:29</a>
+          <span class="timeline-time">00:29</span>
           <div class="timeline-content"><strong>Trace Collection</strong>
-            <span>Record system-wide CPU scheduling activity using Perfetto.</span>
+            <span>Record a five-minute system-wide Perfetto trace with a 64 MB buffer, capturing CPU scheduling, frequency, and idle-state events.</span>
           </div>
         </li>
         <li>
-          <a class="timeline-time" href="#demo-video" data-seek="95" aria-label="Play from 01:35">01:35</a>
+          <span class="timeline-time">01:35</span>
           <div class="timeline-content"><strong>Utilization Analysis</strong>
-            <span>Analyse the collected trace and calculate LITTLE-core utilisation using an SQL query.</span>
+            <span>Open the collected trace in the Perfetto UI and execute an SQL query to calculate the time utilisation of each LITTLE core from CPU scheduling records. The six LITTLE cores exhibit an average utilisation of <strong>16.76%</strong> during the measurement interval.</span>
           </div>
         </li>
       </ol>
+    </section>
+
+    <section class="information-section" aria-labelledby="results-title">
+      <h2 id="results-title">Measurement Results</h2>
+      <figure class="results-figure">
+        <a href="measurement_results.jpg" target="_blank" rel="noopener noreferrer" aria-label="View measurement results at full resolution">
+          <img src="measurement_results.jpg" alt="Perfetto SQL query results showing utilisation of CPU0 through CPU5 and average LITTLE-core utilisation of 16.76%" loading="lazy">
+        </a>
+        <figcaption>Time utilisation of the six LITTLE cores (CPU0–CPU5) measured from the collected trace. Click the image to view it at full resolution.</figcaption>
+      </figure>
     </section>
 
     <section class="download" aria-label="README documentation">
@@ -192,25 +206,6 @@
     </section>
 
   </main>
-  <script>
-    (function () {
-      const video = document.getElementById('demo-video');
-      document.querySelectorAll('[data-seek]').forEach(function (link) {
-        link.addEventListener('click', function (event) {
-          event.preventDefault();
-          const seconds = Number(link.getAttribute('data-seek'));
-          if (video && Number.isFinite(seconds)) {
-            const seek = function () {
-              video.currentTime = Math.min(seconds, Number.isFinite(video.duration) ? video.duration : seconds);
-              video.play().catch(function () {});
-            };
-            if (video.readyState >= 1) seek();
-            else video.addEventListener('loadedmetadata', seek, { once: true });
-            video.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        });
-      });
-    })();
-  </script>
+
 </body>
 </html>
